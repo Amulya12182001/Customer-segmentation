@@ -7,16 +7,16 @@ from sklearn.preprocessing import StandardScaler
 app = Flask(__name__, template_folder="src", static_folder="src")
 
 # Load the saved model and scaler
-with open(r'C:\Users\amuly\Downloads\DIC\vignesht_amulyare_manasala_phase2\src\kmeans_model.pkl', 'rb') as f:
+with open('kmeans_model.pkl', 'rb') as f:
     kmeans = pickle.load(f)
 
-with open(r'C:\Users\amuly\Downloads\DIC\vignesht_amulyare_manasala_phase2\src\scaler.pkl', 'rb') as f:
+with open('scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
 
 # Route for the home page
 @app.route('/')
 def home():
-    return render_template(r'C:\Users\amuly\Downloads\DIC\vignesht_amulyare_manasala_phase2\src\index.html')
+    return render_template('index.html')
 
 # Route for the prediction
 @app.route('/predict', methods=['POST'])
@@ -42,7 +42,7 @@ def predict():
     cluster = kmeans.predict(scaled_input)
 
     # Display the result
-    return render_template(r'C:\Users\amuly\Downloads\DIC\vignesht_amulyare_manasala_phase2\src\index.html', cluster=cluster[0], recency=recency, frequency=frequency, monetary=monetary)
+    return render_template('index.html', cluster=cluster[0], recency=recency, frequency=frequency, monetary=monetary)
 
 # Run the app
 if __name__ == "__main__":
