@@ -1,49 +1,45 @@
-from flask import Flask, render_template, request
+import streamlit as st
 import pickle
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-# Initialize Flask application
-app = Flask(__name__, template_folder="src", static_folder="src")
-
 # Load the saved model and scaler
-with open('kmeans_model.pkl', 'rb') as f:
+with open(r'C:\Users\amuly\Downloads\DIC\vignesht_amulyare_manasala_phase2\src\kmeans_model.pkl', 'rb') as f:
     kmeans = pickle.load(f)
 
-with open('scaler.pkl', 'rb') as f:
+with open(r'C:\Users\amuly\Downloads\DIC\vignesht_amulyare_manasala_phase2\src\scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
 
-# Route for the home page
-@app.route('/')
-def home():
-    return render_template('index.html')
+# Streamlit App
+def main():
+    # Title of the app
+    st.title("Customer Segmentation with KMeans Clustering")
 
-# Route for the prediction
-@app.route('/predict', methods=['POST'])
-def predict():
-    # Get the user input from the form
-    try:
-        recency = float(request.form['Recency'])
-        frequency = float(request.form['Frequency'])
-        monetary = float(request.form['Monetary'])
-    except ValueError:
-        return "Invalid input! Please enter numeric values."
+    # Create input fields for user data
+    recency = st.number_input("Recency", min_value=0.0, step=0.1)
+    frequency = st.number_input("Frequency", min_value=0.0, step=0.1)
+    monetary = st.number_input("Monetary", min_value=0.0, step=0.1)
 
-    # Prepare the input data and scale it
-    input_data = pd.DataFrame({
-        'Recency': [recency],
-        'Frequency': [frequency],
-        'Monetary': [monetary]
-    })
-    
-    scaled_input = scaler.transform(input_data)
+    # Button to predict cluster
+    if st.button("Predict Cluster"):
+        try:
+            # Prepare the input data and scale it
+            input_data = pd.DataFrame({
+                'Recency': [recency],
+                'Frequency': [frequency],
+                'Monetary': [monetary]
+            })
 
-    # Predict the cluster
-    cluster = kmeans.predict(scaled_input)
+            scaled_input = scaler.transform(input_data)
 
-    # Display the result
-    return render_template('index.html', cluster=cluster[0], recency=recency, frequency=frequency, monetary=monetary)
+            # Predict the cluster
+            cluster = kmeans.predict(scaled_input)
 
-# Run the app
+            # Display the result
+            st.write(f"The customer belongs to Cluster {cluster[0]}")
+            st.write(f"Recency: {recency}, Frequency: {frequency}, Monetary: {monetary}")
+        except ValueError:
+            st.error("Invalid input! Please enter numeric values.")
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    main()
